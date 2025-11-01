@@ -9,6 +9,9 @@ export const cleanUpData = (data) => {
     if (parsed >= 2016) {
       return false;
     }
+    if (parsed <= 860) {
+      return false;
+    }
     return true;
   });
   return cleanData;
