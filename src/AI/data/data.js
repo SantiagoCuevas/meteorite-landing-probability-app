@@ -1,4 +1,6 @@
+import csv from "./meteorite-landings.csv";
+
 export const getData = () => {
-  return [];
+  return csv;
 };
 export const cleanUpData = () => {};

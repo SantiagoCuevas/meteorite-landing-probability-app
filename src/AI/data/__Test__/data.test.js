@@ -7,5 +7,9 @@ describe("AI data functions", () => {
       const result = getData();
       expect(Array.isArray(result)).toBeTruthy();
     });
+    it("Returns the expected array length", () => {
+      const result = getData();
+      expect(result.length).toEqual(45716);
+    });
   });
 });
