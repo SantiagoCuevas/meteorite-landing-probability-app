@@ -16,6 +16,9 @@ export const cleanUpData = (data) => {
     if (item.reclat === "" || item.reclong === "") {
       return false;
     }
+    if (item.reclat === "0.000000" || item.reclong === "0.000000") {
+      return false;
+    }
     return true;
   });
   return cleanData;

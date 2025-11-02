@@ -40,5 +40,14 @@ describe("AI data functions", () => {
         result.some((item) => item.reclat === "" || item.reclong === "")
       ).toEqual(false);
     });
+    it("Removes data with lat long values 0, 0", () => {
+      const data = getData();
+      const result = cleanUpData(data);
+      expect(
+        result.some(
+          (item) => item.reclat === "0.000000" && item.reclong === "0.000000"
+        )
+      ).toEqual(false);
+    });
   });
 });
