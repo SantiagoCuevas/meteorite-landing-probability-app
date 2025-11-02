@@ -7,7 +7,6 @@ export const getData = () => {
 export const cleanUpData = (data) => {
   const cleanData = data.filter((item) => {
     const parsedYear = parseInt(item.year);
-    const parsedLat = parseInt(item.reclat);
     const parsedLong = parseInt(item.reclong);
 
     if (parsedYear >= 2016) {
@@ -22,7 +21,7 @@ export const cleanUpData = (data) => {
     if (item.reclat === "0.000000" || item.reclong === "0.000000") {
       return false;
     }
-    if (parsedLat <= 180 && parsedLong >= -180) {
+    if (parsedLong > 180 || parsedLong < -180) {
       return false;
     }
     return true;
