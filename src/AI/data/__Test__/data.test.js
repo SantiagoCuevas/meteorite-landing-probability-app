@@ -49,5 +49,15 @@ describe("AI data functions", () => {
         )
       ).toEqual(false);
     });
+    it("Removes data with lat long values above and below 180 and -180", () => {
+      const data = getData();
+      const result = cleanUpData(data);
+      expect(
+        result.some(
+          (item) =>
+            parseInt(item.reclat) <= 180 && parseInt(item.reclat) >= -180
+        )
+      ).toEqual(false);
+    });
   });
 });

@@ -6,17 +6,23 @@ export const getData = () => {
 
 export const cleanUpData = (data) => {
   const cleanData = data.filter((item) => {
-    const parsed = parseInt(item.year);
-    if (parsed >= 2016) {
+    const parsedYear = parseInt(item.year);
+    const parsedLat = parseInt(item.reclat);
+    const parsedLong = parseInt(item.reclong);
+
+    if (parsedYear >= 2016) {
       return false;
     }
-    if (parsed <= 860) {
+    if (parsedYear <= 860) {
       return false;
     }
     if (item.reclat === "" || item.reclong === "") {
       return false;
     }
     if (item.reclat === "0.000000" || item.reclong === "0.000000") {
+      return false;
+    }
+    if (parsedLat <= 180 && parsedLong >= -180) {
       return false;
     }
     return true;
