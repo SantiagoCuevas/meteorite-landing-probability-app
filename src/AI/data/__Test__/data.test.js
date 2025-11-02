@@ -33,5 +33,12 @@ describe("AI data functions", () => {
         false
       );
     });
+    it("Removes data with empty lat long values", () => {
+      const data = getData();
+      const result = cleanUpData(data);
+      expect(
+        result.some((item) => item.reclat === "" || item.reclong === "")
+      ).toEqual(false);
+    });
   });
 });

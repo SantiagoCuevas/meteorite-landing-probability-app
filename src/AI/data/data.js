@@ -3,6 +3,7 @@ import csv from "./meteorite-landings.csv";
 export const getData = () => {
   return csv;
 };
+
 export const cleanUpData = (data) => {
   const cleanData = data.filter((item) => {
     const parsed = parseInt(item.year);
@@ -10,6 +11,9 @@ export const cleanUpData = (data) => {
       return false;
     }
     if (parsed <= 860) {
+      return false;
+    }
+    if (item.reclat === "" || item.reclong === "") {
       return false;
     }
     return true;
