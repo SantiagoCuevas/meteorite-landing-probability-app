@@ -37,15 +37,19 @@ export const cleanUpData = (data) => {
   return cleanData;
 };
 
-export const formatHeatmapData = (cleanedData) => {
-  const latArray = [];
-  const longArray = [];
-  const points = [];
+export const formatPieChartData = (cleanedData) => {
+  const classifications = {};
 
   cleanedData.forEach((item) => {
-    latArray.push(item.reclat);
-    longArray.push(item.reclong);
-    points.push(1);
+    const key = item.recclass?.trim();
+    if (!key) return;
+
+    classifications[key] = (classifications[key] || 0) + 1;
   });
-  return { latArray, longArray, points };
+
+  const array = Object.entries(classifications)
+    .map(([recclass, count]) => ({ recclass, count }))
+    .sort((a, b) => b.count - a.count);
+
+  return array.slice(0, 10);
 };
