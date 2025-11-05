@@ -5,26 +5,35 @@ export const getData = () => {
 };
 
 export const cleanUpData = (data) => {
-  const cleanData = data.filter((item) => {
-    const parsedYear = parseInt(item.year);
-    const parsedLong = parseInt(item.reclong);
+  const cleanData = data
+    .map((item) => {
+      const id = parseInt(item.id);
+      const mass = parseInt(item.mass);
+      const reclat = parseFloat(item.reclat);
+      const reclong = parseFloat(item.reclong);
+      const year = parseInt(item.year, 10);
 
-    if (parsedYear >= 2016) {
-      return false;
-    }
-    if (parsedYear <= 860) {
-      return false;
-    }
-    if (item.reclat === "" || item.reclong === "") {
-      return false;
-    }
-    if (item.reclat === "0.000000" || item.reclong === "0.000000") {
-      return false;
-    }
-    if (parsedLong > 180 || parsedLong < -180) {
-      return false;
-    }
-    return true;
-  });
+      return { ...item, id, mass, reclat, reclong, year };
+    })
+
+    .filter((item) => {
+      if (item.year >= 2016) {
+        console.log("This");
+        return false;
+      }
+      if (item.year <= 860) {
+        return false;
+      }
+      if (item.reclat === 0 || item.reclong === 0) {
+        return false;
+      }
+      if (item.reclat === 0.0 || item.reclong === 0.0) {
+        return false;
+      }
+      if (item.reclong > 180 || item.reclong < -180) {
+        return false;
+      }
+      return true;
+    });
   return cleanData;
 };

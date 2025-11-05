@@ -22,31 +22,25 @@ describe("AI data functions", () => {
     it("Removes data with year 2016 or later", () => {
       const data = getData();
       const result = cleanUpData(data);
-      expect(result.some((item) => parseInt(item.year, 10) >= 2016)).toEqual(
-        false
-      );
+      expect(result.some((item) => item.year >= 2016)).toEqual(false);
     });
     it("Removes data with year 860 or earlier", () => {
       const data = getData();
       const result = cleanUpData(data);
-      expect(result.some((item) => parseInt(item.year, 10) <= 860)).toEqual(
-        false
-      );
+      expect(result.some((item) => item.year <= 860)).toEqual(false);
     });
     it("Removes data with empty lat long values", () => {
       const data = getData();
       const result = cleanUpData(data);
       expect(
-        result.some((item) => item.reclat === "" || item.reclong === "")
+        result.some((item) => item.reclat === 0 || item.reclong === 0)
       ).toEqual(false);
     });
     it("Removes data with lat long values 0, 0", () => {
       const data = getData();
       const result = cleanUpData(data);
       expect(
-        result.some(
-          (item) => item.reclat === "0.000000" && item.reclong === "0.000000"
-        )
+        result.some((item) => item.reclat === 0.0 && item.reclong === 0.0)
       ).toEqual(false);
     });
     it("Removes data with long values above 180 and below -180", () => {
@@ -54,12 +48,11 @@ describe("AI data functions", () => {
       const result = cleanUpData(data);
       expect(
         result.some((item) => {
-          const longitude = parseFloat(item.reclong);
-          if (longitude > 180) {
+          if (item.reclong > 180) {
             return true;
           }
 
-          if (longitude < -180) {
+          if (item.reclong < -180) {
             return true;
           }
 
