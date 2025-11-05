@@ -18,7 +18,6 @@ export const cleanUpData = (data) => {
 
     .filter((item) => {
       if (item.year >= 2016) {
-        console.log("This");
         return false;
       }
       if (item.year <= 860) {
@@ -36,4 +35,17 @@ export const cleanUpData = (data) => {
       return true;
     });
   return cleanData;
+};
+
+export const formatHeatmapData = (cleanedData) => {
+  const latArray = [];
+  const longArray = [];
+  const points = [];
+
+  cleanedData.forEach((item) => {
+    latArray.push(item.reclat);
+    longArray.push(item.reclong);
+    points.push(1);
+  });
+  return { latArray, longArray, points };
 };
