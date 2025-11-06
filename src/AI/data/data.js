@@ -7,8 +7,8 @@ export const getData = () => {
 export const cleanUpData = (data) => {
   const cleanData = data
     .map((item) => {
-      const id = parseInt(item.id);
-      const mass = parseInt(item.mass);
+      const id = parseInt(item.id, 10);
+      let mass = parseInt(item.mass, 10) || 0;
       const reclat = parseFloat(item.reclat);
       const reclong = parseFloat(item.reclong);
       const year = parseInt(item.year, 10);
