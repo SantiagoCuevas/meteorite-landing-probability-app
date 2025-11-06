@@ -20,3 +20,7 @@ export function tileBounds(latTile, lonTile) {
   const east = lonTile + 1;
   return [south, west, north, east];
 }
+
+export function tileKey(latTile, lonTile) {
+  return `${latTile},${lonTile}`;
+}
