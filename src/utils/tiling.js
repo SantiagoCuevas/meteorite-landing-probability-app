@@ -48,3 +48,10 @@ export function aggregateTiles(cleanData) {
   }
   return out;
 }
+
+export function normalizeCounts(tileArray) {
+  if (tileArray.length === 0) return tileArray;
+  const max = Math.max(...tileArray.map((t) => t.count));
+  if (max <= 0) return tileArray.map((t) => ({ ...t, rate: 0 }));
+  return tileArray.map((t) => ({ ...t, rate: t.count / max }));
+}
