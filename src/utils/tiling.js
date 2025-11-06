@@ -12,3 +12,11 @@ export function latLongCoordToTile(lat, lon) {
   const lonTile = Math.floor(safeLon);
   return { latTile, lonTile };
 }
+
+export function tileBounds(latTile, lonTile) {
+  const south = latTile;
+  const west = lonTile;
+  const north = latTile + 1;
+  const east = lonTile + 1;
+  return [south, west, north, east];
+}
