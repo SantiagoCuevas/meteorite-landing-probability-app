@@ -24,3 +24,27 @@ export function tileBounds(latTile, lonTile) {
 export function tileKey(latTile, lonTile) {
   return `${latTile},${lonTile}`;
 }
+
+export function aggregateTiles(cleanData) {
+  const counts = new Map();
+
+  for (const entry of cleanData) {
+    const { latTile, lonTile } = latLongCoordToTile(
+      entry.reclat,
+      entry.reclong
+    );
+    const key = tileKey(latTile, lonTile);
+    counts.set(key, (counts.get(key) || 0) + 1);
+  }
+
+  const out = [];
+  for (const [key, count] of counts.entries()) {
+    const [latTileStr, lonTileStr] = key.split(",");
+    out.push({
+      latTile: Number(latTileStr),
+      lonTile: Number(lonTileStr),
+      count,
+    });
+  }
+  return out;
+}
