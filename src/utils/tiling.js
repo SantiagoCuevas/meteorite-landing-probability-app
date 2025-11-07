@@ -1,7 +1,7 @@
 const clampLatitude = (lat) => Math.min(Math.max(lat, -90), 90);
 const clampLongitude = (lon) => Math.min(Math.max(lon, -180), 180);
 
-export function latLongCoordToTile(lat, lon) {
+export const latLongCoordToTile = (lat, lon) => {
   const latitude = clampLatitude(Number(lat));
   const longitude = clampLongitude(Number(lon));
 
@@ -11,21 +11,21 @@ export function latLongCoordToTile(lat, lon) {
   const latTile = Math.floor(safeLat);
   const lonTile = Math.floor(safeLon);
   return { latTile, lonTile };
-}
+};
 
-export function tileBounds(latTile, lonTile) {
+export const tileBounds = (latTile, lonTile) => {
   const south = latTile;
   const west = lonTile;
   const north = latTile + 1;
   const east = lonTile + 1;
   return [south, west, north, east];
-}
+};
 
 export function tileKey(latTile, lonTile) {
   return `${latTile},${lonTile}`;
 }
 
-export function aggregateTiles(cleanData) {
+export const aggregateTiles = (cleanData) => {
   const counts = new Map();
 
   for (const entry of cleanData) {
@@ -47,11 +47,11 @@ export function aggregateTiles(cleanData) {
     });
   }
   return out;
-}
+};
 
-export function normalizeCounts(tileArray) {
+export const normalizeCounts = (tileArray) => {
   if (tileArray.length === 0) return tileArray;
   const max = Math.max(...tileArray.map((t) => t.count));
   if (max <= 0) return tileArray.map((t) => ({ ...t, rate: 0 }));
   return tileArray.map((t) => ({ ...t, rate: t.count / max }));
-}
+};
