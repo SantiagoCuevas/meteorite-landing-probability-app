@@ -52,3 +52,11 @@ export async function trainModel(model, xs, ys) {
   yVal.dispose();
   return history;
 }
+
+export async function loadModelIfAny() {
+  try {
+    return await tf.loadLayersModel("localstorage://meteorite-rate-model");
+  } catch {
+    return null;
+  }
+}
