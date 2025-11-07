@@ -26,3 +26,29 @@ export function buildModel() {
   model.compile({ optimizer: tf.train.adam(0.01), loss: "meanSquaredError" });
   return model;
 }
+
+export async function trainModel(model, xs, ys) {
+  const N = xs.shape[0];
+  const idx = tf.util.createShuffledIndices(N);
+  const split = Math.floor(N * 0.8);
+  const trainIdx = idx.slice(0, split);
+  const valIdx = idx.slice(split);
+
+  const xTrain = tf.gather(xs, trainIdx);
+  const yTrain = tf.gather(ys, trainIdx);
+  const xVal = tf.gather(xs, valIdx);
+  const yVal = tf.gather(ys, valIdx);
+
+  const history = await model.fit(xTrain, yTrain, {
+    epochs: 100,
+    batchSize: 64,
+    validationData: [xVal, yVal],
+    verbose: 0,
+  });
+
+  xTrain.dispose();
+  yTrain.dispose();
+  xVal.dispose();
+  yVal.dispose();
+  return history;
+}
