@@ -3,7 +3,7 @@ import * as tf from "@tensorflow/tfjs";
 const normLatitude = (latTile) => latTile / 90;
 const normLongitude = (lonTile) => lonTile / 180;
 
-export function makeTrainingTensors(tileArray) {
+export const makeTrainingTensors = (tileArray) => {
   const rows = tileArray.filter((t) => Number.isFinite(t.rate));
   const xsArr = rows.map((t) => [
     normLatitude(t.latTile),
@@ -14,9 +14,9 @@ export function makeTrainingTensors(tileArray) {
   const xs = tf.tensor2d(xsArr);
   const ys = tf.tensor2d(ysArr);
   return { xs, ys, count: rows.length };
-}
+};
 
-export function buildModel() {
+export const buildModel = () => {
   const model = tf.sequential();
   model.add(
     tf.layers.dense({ units: 16, activation: "relu", inputShape: [2] })
@@ -25,9 +25,9 @@ export function buildModel() {
   model.add(tf.layers.dense({ units: 1, activation: "sigmoid" }));
   model.compile({ optimizer: tf.train.adam(0.01), loss: "meanSquaredError" });
   return model;
-}
+};
 
-export async function trainModel(model, xs, ys) {
+export const trainModel = async (model, xs, ys) => {
   const N = xs.shape[0];
   const idx = tf.util.createShuffledIndices(N);
   const split = Math.floor(N * 0.8);
@@ -51,15 +51,25 @@ export async function trainModel(model, xs, ys) {
   xVal.dispose();
   yVal.dispose();
   return history;
-}
-export async function saveModel(model) {
-  await model.save("localstorage://meteorite-rate-model");
-}
+};
 
-export async function loadModelIfAny() {
+export const saveModel = async (model) => {
+  await model.save("localstorage://meteorite-rate-model");
+};
+
+export const loadModelIfAny = async () => {
   try {
     return await tf.loadLayersModel("localstorage://meteorite-rate-model");
   } catch {
     return null;
   }
-}
+};
+
+export const predictRate = (model, latTile, lonTile) => {
+  const x = tf.tensor2d([[normLatitude(latTile), normLongitude(lonTile)]]);
+  const y = model.predict(x);
+  const rate = y.dataSync()[0];
+  x.dispose();
+  y.dispose();
+  return rate;
+};
