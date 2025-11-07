@@ -52,6 +52,9 @@ export async function trainModel(model, xs, ys) {
   yVal.dispose();
   return history;
 }
+export async function saveModel(model) {
+  await model.save("localstorage://meteorite-rate-model");
+}
 
 export async function loadModelIfAny() {
   try {
