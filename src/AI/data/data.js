@@ -17,6 +17,9 @@ export const cleanUpData = (data) => {
     })
 
     .filter((item) => {
+      if (!Number.isFinite(item.reclat) || !Number.isFinite(item.reclong)) {
+        return false;
+      }
       if (item.year >= 2016) {
         return false;
       }
