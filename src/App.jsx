@@ -4,7 +4,6 @@ import { cleanUpData, getData } from "./AI/data/data";
 import { PieChart } from "./components/PieChart";
 import { HistogramChart } from "./components/HistogramChart";
 import { LineTrendChart } from "./components/LineTrendChart";
-import { ModelTestHarness } from "./components/ModelTestComponent";
 
 function App() {
   const [count, setCount] = useState(0);
