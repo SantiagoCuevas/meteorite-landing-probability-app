@@ -14,6 +14,8 @@ import {
   predictRate,
   saveModel,
   trainModel,
+  getBackendInfo,
+  ensureWebGLBackend,
 } from "../AI/aiModel";
 
 const formatLoss = (value) =>
@@ -39,6 +41,8 @@ export function ModelTestComponent() {
   const [model, setModel] = useState(null);
   const [status, setStatus] = useState("bootstrapping…");
   const [trainingSummary, setTrainingSummary] = useState(null);
+  const [trainingProgress, setTrainingProgress] = useState(null);
+  const [backendInfo, setBackendInfo] = useState(null);
   const [error, setError] = useState(null);
   const [predictionInput, setPredictionInput] = useState({ lat: 0, lon: 0 });
   const [prediction, setPrediction] = useState(null);
@@ -47,9 +51,13 @@ export function ModelTestComponent() {
     let cancelled = false;
     (async () => {
       try {
-        setStatus("loading saved model…");
-        const stored = await loadModelIfAny();
+        setStatus("initializing TensorFlow backend…");
+        await ensureWebGLBackend();
+        const info = await getBackendInfo();
         if (!cancelled) {
+          setBackendInfo(info);
+          setStatus("loading saved model…");
+          const stored = await loadModelIfAny();
           setModel(stored ?? buildModel());
           setStatus("ready");
         }
@@ -70,19 +78,27 @@ export function ModelTestComponent() {
     if (!tiles.length) return;
     setStatus("training");
     setError(null);
+    setTrainingProgress(null);
     const { xs, ys, count } = makeTrainingTensors(tiles);
     const activeModel = model ?? buildModel();
 
+    // Calculate optimal batch size (same logic as in trainModel)
+    const optimalBatchSize = Math.min(512, Math.floor(count * 0.8 * 0.2));
+
     try {
-      const history = await trainModel(activeModel, xs, ys);
+      const history = await trainModel(activeModel, xs, ys, (progress) => {
+        setTrainingProgress(progress);
+      });
       await saveModel(activeModel);
       setModel(activeModel);
       setTrainingSummary({
         samples: count,
+        batchSize: optimalBatchSize,
         epochs: history.epoch.length,
         loss: history.history.loss.at(-1),
         valLoss: history.history.val_loss.at(-1),
       });
+      setTrainingProgress(null);
     } catch (err) {
       setError(err.message ?? String(err));
     } finally {
@@ -132,6 +148,21 @@ export function ModelTestComponent() {
     <section className="model-test-harness">
       <h2>TensorFlow Test</h2>
       <p>Status: {status}</p>
+
+      {backendInfo && (
+        <div className="backend-info">
+          <p>
+            <strong>Backend:</strong> {backendInfo.backend}
+            {backendInfo.isWebGL && " (GPU Accelerated ✓)"}
+          </p>
+          {backendInfo.gpuInfo && (
+            <p>
+              <strong>GPU:</strong> {backendInfo.gpuInfo}
+            </p>
+          )}
+        </div>
+      )}
+
       {error && <p className="error">Error: {error}</p>}
 
       <div className="controls">
@@ -143,10 +174,33 @@ export function ModelTestComponent() {
         </button>
       </div>
 
+      {trainingProgress && (
+        <div className="training-progress">
+          <h3>Training Progress</h3>
+          <div className="progress-bar">
+            <div
+              className="progress-fill"
+              style={{ width: `${trainingProgress.epoch}%` }}
+            />
+          </div>
+          <p>
+            <strong>Epoch:</strong> {trainingProgress.epoch}/100
+          </p>
+          <p>
+            <strong>Loss:</strong> {formatLoss(trainingProgress.loss)}
+          </p>
+          <p>
+            <strong>Val Loss:</strong> {formatLoss(trainingProgress.valLoss)}
+          </p>
+        </div>
+      )}
+
       {trainingSummary && (
         <dl className="metrics">
           <dt>Samples</dt>
           <dd>{trainingSummary.samples}</dd>
+          <dt>Batch Size</dt>
+          <dd>{trainingSummary.batchSize} (GPU optimized)</dd>
           <dt>Epochs</dt>
           <dd>{trainingSummary.epochs}</dd>
           <dt>Final Loss</dt>
