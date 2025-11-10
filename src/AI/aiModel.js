@@ -31,13 +31,14 @@ export const trainModel = async (model, xs, ys) => {
   const N = xs.shape[0];
   const idx = tf.util.createShuffledIndices(N);
   const split = Math.floor(N * 0.8);
-  const trainIdx = idx.slice(0, split);
-  const valIdx = idx.slice(split);
 
-  const xTrain = tf.gather(xs, trainIdx);
-  const yTrain = tf.gather(ys, trainIdx);
-  const xVal = tf.gather(xs, valIdx);
-  const yVal = tf.gather(ys, valIdx);
+  const trainIdxTensor = tf.tensor1d(Array.from(idx.slice(0, split)), "int32");
+  const valIdxTensor = tf.tensor1d(Array.from(idx.slice(split)), "int32");
+
+  const xTrain = tf.gather(xs, trainIdxTensor);
+  const yTrain = tf.gather(ys, trainIdxTensor);
+  const xVal = tf.gather(xs, valIdxTensor);
+  const yVal = tf.gather(ys, valIdxTensor);
 
   const history = await model.fit(xTrain, yTrain, {
     epochs: 100,
@@ -50,6 +51,9 @@ export const trainModel = async (model, xs, ys) => {
   yTrain.dispose();
   xVal.dispose();
   yVal.dispose();
+  trainIdxTensor.dispose();
+  valIdxTensor.dispose();
+
   return history;
 };
 
@@ -59,7 +63,14 @@ export const saveModel = async (model) => {
 
 export const loadModelIfAny = async () => {
   try {
-    return await tf.loadLayersModel("localstorage://meteorite-rate-model");
+    const loaded = await tf.loadLayersModel(
+      "localstorage://meteorite-rate-model"
+    );
+    loaded.compile({
+      optimizer: tf.train.adam(0.01),
+      loss: "meanSquaredError",
+    });
+    return loaded;
   } catch {
     return null;
   }
